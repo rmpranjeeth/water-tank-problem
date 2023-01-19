@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Water Tank Problem</title>
+  <style>
+    /* CSS styles for the container */
+    #container {
+      width: 500px;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+  <form>
+    <label for="blockHeights">Enter block heights (comma separated):</label>
+    <input type="text" id="blockHeights">
+    <button type="button" onclick="createVisualization()">Visualize</button>
+  </form>
+  <p id="output"></p>
+  <svg id="container" viewBox="0 0 500 200"></svg>
+  <script>
+    function createVisualization() {
+      // Get the input block heights
+      var blockHeights = document.getElementById("blockHeights").value;
+      // Split the input string into an array of integers
+      blockHeights = blockHeights.split(",").map(function(height) {
+        return parseInt(height) + 50;
+      });
+
+      // Calculate the units of water stored
+      var waterUnits = 0;
+      for (var i = 1; i < blockHeights.length - 1; i++) {
+        var leftMax = Math.max(...blockHeights.slice(0, i));
+        var rightMax = Math.max(...blockHeights.slice(i + 1));
+        var minHeight = Math.min(leftMax, rightMax);
+        if (minHeight > blockHeights[i]) {
+          waterUnits += minHeight - blockHeights[i];
+        }
+      }
+
+      // Clear the container
+      var container = document.getElementById("container");
+      container.innerHTML = "";
+
+      // Create the blocks
+      for (var i = 0; i < blockHeights.length; i++) {
+        var block = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        block.setAttribute("x", i * 50);
+        block.setAttribute("y", 200 - blockHeights[i]);
+        block.setAttribute("width", 50);
+        block.setAttribute("height", blockHeights[i]);
+        block.setAttribute("fill", "red");
+        container.appendChild(block);
+
+        // Check for water
+        var leftMax = Math.max(...blockHeights.slice(0, i));
+        var rightMax = Math.max(...blockHeights.slice(i + 1));
+        var minHeight = Math.min(leftMax, rightMax);
+        if (minHeight > blockHeights[i]) {
+          var waterHeight = minHeight - blockHeights[i] + 50;
+          var waterBlock = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          waterBlock.setAttribute("x", i * 50);
+          waterBlock.setAttribute("y", 200 - minHeight);
+          waterBlock.setAttribute("width", 50);
+          waterBlock.setAttribute("height", waterHeight);
+          waterBlock.setAttribute("fill", "blue");
+          container.appendChild(waterBlock);
+        }
+      }
+
+
+      // Display the output
+      document.getElementById("output").innerHTML = "Total units of water stored: " + waterUnits;
+    }
+  </script>
+</body>
+</html>
